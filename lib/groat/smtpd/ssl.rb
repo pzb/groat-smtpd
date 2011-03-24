@@ -18,30 +18,33 @@
     Peter Bowen <pzbowen@gmail.com> Ottawa, Ontario, Canada
 =end
 
+require 'openssl'
+
 module Groat
 module SMTPD
-  module Extensions
-    module EightBitMIME
+  module SSL
       def self.included mod
-        puts "Included RFC 1652: 8bit-MIMEtransport"
-        mod.ehlo_keyword :"8bitmime"
-        mod.mail_param :body, :mail_param_body
-        mod.inheritable_attr(:body_encodings)
-        mod.body_encodings = [] if mod.body_encodings.nil?
-        mod.body_encodings << "8BITMIME" unless mod.body_encodings.include? "8BITMIME"
-        mod.body_encodings << "7BIT" unless mod.body_encodings.include? "7BIT"
+        puts "Included SSL support"
+      end
+
+      def reset_connection
+        @secure = true
         super
       end
 
-      def mail_param_body(param)
-        param.upcase!
-        unless self.class.body_encodings.include? param
-          response_bad_parameter(:message => "Unown mail body type")
-        end
-        @mail_body = param
-        puts "MAIL BODY=#{@mail_body}"
+      def set_ssl_context(ctx)
+        @sslctx = ctx
       end
-    end
+
+      def secure?
+        @secure
+      end
+
+      def set_socket(io)
+        ssl = OpenSSL::SSL::SSLSocket.new(io, @sslctx)
+        ssl.accept
+        super(ssl)
+      end
   end
 end
 end

@@ -27,17 +27,17 @@ module SMTPD
         raise SMTPExtensionError.new("BINARYMIME requires CHUNKING") unless mod.ehlo_keyword_known? :chunking
         mod.ehlo_keyword :binarymime
         mod.mail_param :body, :mail_param_body
-        @body_encodings = [] if @body_encodings.nil?
-        @body_encodings << "BINARYMIME" unless @body_encodings.include? "BINARYMIME"
-        @body_encodings << "7BIT" unless @body_encodings.include? "7BIT"
+        mod.inheritable_attr(:body_encodings)
+        mod.body_encodings = [] if mod.body_encodings.nil?
+        mod.body_encodings << "BINARYMIME" unless mod.body_encodings.include? "BINARYMIME"
+        mod.body_encodings << "7BIT" unless mod.body_encodings.include? "7BIT"
         super
       end
 
       def mail_param_body(param)
         param.upcase!
-        unless @body_encodings.include? param
+        unless self.class.body_encodings.include? param
           response_bad_parameter(:message => "Unown mail body type")
-        end
         end
         @mail_body = param
         puts "MAIL BODY=#{@mail_body}"
