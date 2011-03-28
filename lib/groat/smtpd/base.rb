@@ -127,6 +127,7 @@ module SMTPD
     def fromclient
       line = getline
       log_line(:in, line)
+      line
     end
 
     def log_line(direction, line)
@@ -143,7 +144,6 @@ module SMTPD
           puts "#{@instanceid}<<" + line
         end
       end
-      line
     end
 
     def toclient(msg)
