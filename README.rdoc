@@ -1,0 +1,22 @@
+= Groat: Simple Mail Transfer Protocol Daemon
+
+= Installation
+
+<tt>gem install groat-smtpd</tt>
+
+= Configuration
+
+Start with the example daemon.  It shows the basics of building a SMTP server
+using Groat.  Simple _include_ the various extensions to add features to your
+server.
+
+= TODO
+
+(in no particular order)
+* Write docs
+* Refactor SSL to have a common ssl base class
+* Refactor 8BitMIME/BinaryMIME to have a common body_encoding base class
+* Create a Mail class to store each mail
+  * Create a Recipient class to store info on each recipient
+* Finish implementing the CHUNKING extension
+* Implement the Enhanced Status Codes extension
