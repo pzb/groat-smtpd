@@ -38,12 +38,14 @@ module SMTPD
           response_bad_command_parameter(:message => "Encrypted session required", 
                                          :terminate => false) unless secure?
           check_command_group
-          unless arg.nil?
-            response_syntax_error(:message => "LOGIN does not allow initial response")
+          # Windows 2008 SMTP seems to pass an arg, and have issues if not accepted
+          if not arg.nil?
+            r = arg.chomp
+          else
+            # Outlook requires "Username:" (vs the draft which says "User Name")
+            toclient "334 " + Base64.encode64("Username:").strip + "\r\n"
+            r = fromclient.chomp
           end
-          # Outlook requires "Username:" (vs the draft which says "User Name")
-          toclient "334 " + Base64.encode64("Username:").strip + "\r\n"
-          r = fromclient.chomp
           if r.eql? '*'
             response_syntax_error(:message => "Authentication Quit")
           end
